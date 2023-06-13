@@ -3,13 +3,16 @@ import requests
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
-
-import requests
-import pandas as pd
 pd.set_option('display.precision', 2)
-import numpy as np
-from bs4 import BeautifulSoup
+
+# Load data
 all_players = pd.read_csv('all_players.csv')
+
+
+##################################################################################
+###  Notebook methods below
+##################################################################################
+
 
 def getPlayerID(player, df):
     playerID = df[df['Player'].str.lower() == player.strip().lower()]
@@ -68,18 +71,23 @@ def proj_kills(player, wins, losses, n=1000):
         return f'THE GENIUS MONSTER: {round(v_avg * wins + d_avg * losses, 2)}'
     return round(v_avg * wins + d_avg * losses, 2)
 
+
+##################################################################################
+###  Flask functionality below
+##################################################################################
+
+
+# Initialize Flash application
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        player = request.form['player']
-        wins = int(request.form['wins'])
-        losses = int(request.form['losses'])
-        n = int(request.form['n'])
-        result = proj_kills(player, wins, losses, n)
-        return render_template('result.html', result=result)
-    return render_template('index.html')
+@app.route('/proj_kills', methods=['POST'])
+def proj_kills_route():
+    data = request.json
+    player = data.get('player')
+    wins = data.get('wins')
+    losses = data.get('losses')
+    n = data.get('n', 1000)
+    return {"proj_kills": proj_kills(player, wins, losses, n)}
 
 if __name__ == '__main__':
     app.run(debug=True)
