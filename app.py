@@ -80,16 +80,13 @@ def proj_kills(player, wins, losses, n=1000):
 
 # Initialize Flash application
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app)
 
 @app.route('/health', methods=['GET'])
-@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def health_check():
     return {"status": "API is up and running"}
 
 @app.route('/proj_kills', methods=['POST'])
-@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def proj_kills_route():
     data = request.json
     player = data.get('player')
