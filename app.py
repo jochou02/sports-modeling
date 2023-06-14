@@ -88,12 +88,16 @@ def health_check():
 
 @app.route('/proj_kills', methods=['POST'])
 def proj_kills_route():
-    data = request.json
-    player = data.get('player')
-    wins = data.get('wins')
-    losses = data.get('losses')
-    n = data.get('n', 1000)
-    return {"proj_kills": proj_kills(player, wins, losses, n)}
+    try:
+        data = request.json
+        player = data.get('player')
+        wins = int(data.get('wins'))
+        losses = int(data.get('losses'))
+        n = data.get('n', 1000)
+        return {"proj_kills": proj_kills(player, wins, losses, n)}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
