@@ -80,7 +80,7 @@ def proj_kills(player, wins, losses, n=1000):
 
 # Initialize Flash application
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://127.0.0.1:5500", "https://sports-modeling.onrender.com"])
 
 @app.route('/health', methods=['GET'])
 def health_check():
