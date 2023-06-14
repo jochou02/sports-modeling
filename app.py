@@ -80,6 +80,10 @@ def proj_kills(player, wins, losses, n=1000):
 # Initialize Flash application
 app = Flask(__name__)
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return {"status": "API is up and running"}
+
 @app.route('/proj_kills', methods=['POST'])
 def proj_kills_route():
     data = request.json
@@ -90,4 +94,4 @@ def proj_kills_route():
     return {"proj_kills": proj_kills(player, wins, losses, n)}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
