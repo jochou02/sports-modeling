@@ -14,9 +14,13 @@ all_players = pd.read_csv('all_players.csv')
 ###  Notebook methods below
 ##################################################################################
 
+class PlayerNotFoundError(Exception):
+    pass
 
 def getPlayerID(player, df):
     playerID = df[df['Player'].str.lower() == player.strip().lower()]
+    if playerID.empty:
+        raise PlayerNotFoundError('Player not found')
     return playerID.iloc[0][1]
 
 def lookupPlayer(playerName, n=1000):
@@ -59,17 +63,11 @@ def proj_kills(player, wins, losses, n=1000):
     df = lookupPlayer(player)[:n]
     df = df[df['Duration'] != '0']
     
-    flag = False
-    if player == 'Keria':
-        flag = True
-    
     v_lst = (sorted(list(df[df['Result'] == 'Victory']['Kills'])))
     v_avg = sum(v_lst)/len(v_lst)
     d_lst = (sorted(list(df[df['Result'] == 'Defeat']['Kills'])))
     d_avg = sum(d_lst)/len(d_lst)
     
-    if flag: 
-        return f'THE GENIUS MONSTER: {round(v_avg * wins + d_avg * losses, 2)}'
     return round(v_avg * wins + d_avg * losses, 2)
 
 
@@ -77,8 +75,7 @@ def proj_kills(player, wins, losses, n=1000):
 ###  Flask functionality below
 ##################################################################################
 
-
-# Initialize Flash application
+# Initialize Flask application
 app = Flask(__name__)
 CORS(app)
 
@@ -95,9 +92,10 @@ def proj_kills_route():
         losses = int(data.get('losses'))
         n = data.get('n', 1000)
         return {"proj_kills": proj_kills(player, wins, losses, n)}
+    except PlayerNotFoundError:
+        return {"error": "Player not found"}, 404
     except Exception as e:
         return {"error": str(e)}, 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
