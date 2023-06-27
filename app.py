@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import requests
 import pandas as pd
 import numpy as np
@@ -83,6 +83,19 @@ CORS(app)
 def health_check():
     return {"status": "API is up and running"}
 
+@app.route('/lookup_player', methods=['POST'])
+def lookup_player_route():
+    try:
+        data = request.json
+        player = data.get('player')
+        n = data.get('n', 1000)
+        df = lookupPlayer(player, n)
+        return {"player_data": df.to_dict(orient='records')}
+    except PlayerNotFoundError:
+        return {"error": "Player not found"}, 404
+    except Exception as e:
+        return {"error": str(e)}, 500
+
 @app.route('/proj_kills', methods=['POST'])
 def proj_kills_route():
     try:
@@ -92,6 +105,25 @@ def proj_kills_route():
         losses = int(data.get('losses'))
         n = data.get('n', 1000)
         return {"proj_kills": proj_kills(player, wins, losses, n)}
+    except PlayerNotFoundError:
+        return {"error": "Player not found"}, 404
+    except Exception as e:
+        return {"error": str(e)}, 500
+    
+@app.route('/player_info', methods=['POST'])
+def player_info_route():
+    try:
+        data = request.json
+        player = data.get('player')
+        wins = int(data.get('wins'))
+        losses = int(data.get('losses'))
+        n = data.get('n', 1000)
+        proj_kills_value = proj_kills(player, wins, losses, n)
+        df = lookupPlayer(player, n)
+        return {
+            "proj_kills": proj_kills_value,
+            "player_data": df.to_dict(orient='records')
+        }
     except PlayerNotFoundError:
         return {"error": "Player not found"}, 404
     except Exception as e:
