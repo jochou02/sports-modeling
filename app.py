@@ -45,6 +45,7 @@ def lookupPlayer(playerName, n=1000):
                         'Result': td_list[1].text, 
                         'KDA': td_list[2].text,
                         'Kills': int(td_list[2].text.split('/')[0]),
+                        'Deaths': int(td_list[2].text.split('/')[1]),
                         'Duration': td_list[4].text,
                         'Date': td_list[5].text,
                         'Team1': teams[0],
@@ -68,6 +69,18 @@ def proj_kills(player, wins, losses, n=1000):
     d_lst = (sorted(list(df[df['Result'] == 'Defeat']['Kills'])))
     d_avg = sum(d_lst)/len(d_lst)
     
+    return round(v_avg * wins + d_avg * losses, 2)
+
+# @param n: look at n most recent games only (optional argument)
+def proj_deaths(player, wins, losses, n=1000):
+    df = lookupPlayer(player)[:n]
+    df = df[df['Duration'] != '0']
+    
+    v_lst = (sorted(list(df[df['Result'] == 'Victory']['Deaths'])))
+    v_avg = sum(v_lst)/len(v_lst)
+    d_lst = (sorted(list(df[df['Result'] == 'Defeat']['Deaths'])))
+    d_avg = sum(d_lst)/len(d_lst)
+
     return round(v_avg * wins + d_avg * losses, 2)
 
 
@@ -110,6 +123,20 @@ def proj_kills_route():
     except Exception as e:
         return {"error": str(e)}, 500
     
+@app.route('/proj_deaths', methods=['POST'])
+def proj_deaths_route():
+    try:
+        data = request.json
+        player = data.get('player')
+        wins = int(data.get('wins'))
+        losses = int(data.get('losses'))
+        n = data.get('n', 1000)
+        return {"proj_deaths": proj_deaths(player, wins, losses, n)}
+    except PlayerNotFoundError:
+        return {"error": "Player not found"}, 404
+    except Exception as e:
+        return {"error": str(e)}, 500
+    
 @app.route('/player_info', methods=['POST'])
 def player_info_route():
     try:
@@ -119,9 +146,11 @@ def player_info_route():
         losses = int(data.get('losses'))
         n = data.get('n', 1000)
         proj_kills_value = proj_kills(player, wins, losses, n)
+        proj_deaths_value = proj_deaths(player, wins, losses, n)
         df = lookupPlayer(player, n)
         return {
             "proj_kills": proj_kills_value,
+            "proj_deaths": proj_deaths_value,
             "player_data": df.to_dict(orient='records')
         }
     except PlayerNotFoundError:
