@@ -50,6 +50,7 @@ def lookupPlayer(playerName, n=1000):
                         'KDA': td_list[2].text,
                         'Kills': int(td_list[2].text.split('/')[0]),
                         'Deaths': int(td_list[2].text.split('/')[1]),
+                        'Assists': int(td_list[2].text.split('/')[2]),
                         'Duration': td_list[4].text,
                         'Date': td_list[5].text,
                         'Team1': teams[0],
