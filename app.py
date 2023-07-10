@@ -77,7 +77,14 @@ def lookupTeam(teamName, n=1000):
 
     output = dict()
     
-    players = doc.find_all('tr')[-7:-2]
+     # Account for player subs when slicing
+    players = doc.find_all('tr')
+    if len(players) == 64:
+        players = players[-5:]
+    else:
+        offset = len(players) - 64 - 1
+        players = players[(-5 - offset):(-1 * offset)]
+
     for player in players:
         role = player.find_all('td')[0].text.strip()
         playerName = player.find_all('a')[0].text
