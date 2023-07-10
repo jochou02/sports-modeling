@@ -31,7 +31,7 @@ def lookupPlayer(playerName, n=1000):
     
     player = getPlayerID(playerName, all_players)
         
-    url = f'https://gol.gg/players/player-matchlist/{player}/season-S13/split-Summer/tournament-ALL/'
+    url = f'https://gol.gg/players/player-matchlist/{player}/season-S13/split-ALL/tournament-ALL/'
     header = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
     }
