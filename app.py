@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 pd.set_option('display.precision', 2)
 
 # Load data
-all_players = pd.read_csv('all_players.csv')
+all_players = pd.read_csv('Data/all_players.csv')
 all_teams = pd.read_csv('Data/all_teams.csv')
 
 ##################################################################################
@@ -227,7 +227,7 @@ def player_info_route():
         return {"error": str(e)}, 500
     
 @app.route('/team_info', methods=['POST'])
-def player_info_route():
+def team_info_route():
     try:
         data = request.json
         team = data.get('team')
